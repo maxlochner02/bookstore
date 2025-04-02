@@ -1,24 +1,37 @@
+// Datei: main.go
 package main
 
 import (
+	"Framework/config"
 	"Framework/handlers"
 	"github.com/gin-gonic/gin"
+	"log"
 )
 
 func main() {
+	dsn := "user=postgres dbname=postgres sslmode=disable password=yourpassword"
+	config.InitDB(dsn)
+	config.Migrate()
+
 	r := gin.Default()
 
-	r.GET("/Authors", handlers.GetAuthors)
-	r.POST("/Authors", handlers.CreateAuthor)
+	// Routen für Bücher
+	r.GET("/books", handlers.GetBooks)
+	r.GET("/books/:id", handlers.GetBookByID)
+	r.POST("/books", handlers.CreateBook)
+	r.PUT("/books/:id", handlers.UpdateBook)
+	r.DELETE("/books/:id", handlers.DeleteBook)
 
-	r.GET("/Categories", handlers.GetCategories)
-	r.POST("/Categories", handlers.CreateCategory)
+	// Routen für Autoren
+	r.GET("/authors", handlers.GetAuthors)
+	r.POST("/authors", handlers.CreateAuthor)
 
-	r.GET("/Books", handlers.GetBooks)
-	r.POST("/Books", handlers.CreateBook)
-	r.GET("/Books/:id", handlers.GetBookByID)
-	r.PUT("/Books/:id", handlers.UpdateBook)
-	r.DELETE("/Books/:id", handlers.DeleteBook)
+	// Routen für Kategorien
+	r.GET("/categories", handlers.GetCategories)
+	r.POST("/categories", handlers.CreateCategory)
 
-	r.Run(":8080")
+	// Server starten
+	if err := r.Run(":8080"); err != nil {
+		log.Fatal("Server starten fehlgeschlagen:", err)
+	}
 }
